@@ -1,0 +1,34 @@
+version: '3.8'
+
+networks:
+  integration-assessment:
+
+services:
+  it_assessment:
+    image: amazoncorretto:17.0.9-alpine3.18
+    ports:
+      - "8888:8081"
+    volumes:
+      - .:/app
+    working_dir: /app
+    depends_on:
+      - db
+    networks:
+      - integration-assessment
+    command: ["./gradlew", "clean", "bootRun"]
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: assessment_usr
+      POSTGRES_PASSWORD: assessment#Kbtg@2024
+      POSTGRES_DB: assessment
+    restart: on-failure
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - integration-assessment
+
+volumes:
+  pgdata:
